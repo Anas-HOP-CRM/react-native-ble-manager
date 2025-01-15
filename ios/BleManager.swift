@@ -66,7 +66,7 @@ class BleManager: RCTEventEmitter, CBCentralManagerDelegate, CBPeripheralDelegat
     @objc override static func requiresMainQueueSetup() -> Bool { return true }
     
     @objc override func supportedEvents() -> [String]! {
-        return ["BleManagerDidUpdateValueForCharacteristic", "BleManagerStopScan", "BleManagerDiscoverPeripheral", "BleManagerConnectPeripheral", "BleManagerDisconnectPeripheral", "BleManagerDidUpdateState", "BleManagerCentralManagerWillRestoreState", "BleManagerDidUpdateNotificationStateFor"]
+        return ["BleManagerDidUpdateValueForCharacteristic", "BleManagerStartScan","BleManagerStopScan", "BleManagerDiscoverPeripheral", "BleManagerConnectPeripheral", "BleManagerDisconnectPeripheral", "BleManagerDidUpdateState", "BleManagerCentralManagerWillRestoreState", "BleManagerDidUpdateNotificationStateFor"]
     }
     
     @objc override func startObserving() {
@@ -264,6 +264,11 @@ class BleManager: RCTEventEmitter, CBCentralManagerDelegate, CBPeripheralDelegat
         }
         
         manager?.scanForPeripherals(withServices: serviceUUIDs, options: options)
+
+        // Trigger start scan event
+        if hasListeners {
+            sendEvent(withName: "BleManagerStartScan", body: ["status": 1])
+        }
         
         if timeoutSeconds.doubleValue > 0 {
             if let scanTimer = scanTimer {
